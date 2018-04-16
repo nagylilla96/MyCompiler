@@ -1,14 +1,14 @@
 all:
 	$(MAKE) grammar
 	$(MAKE) lex
-	g++ -std=c++11 -Wall -Wextra grammar.tab.c lex.yy.c main.c
+	g++ -std=c++11 -Wall -Wextra calc.tab.c lex.yy.c
 
 grammar:
-	bison -d grammar.y
+	bison -d calc.y
 
 lex:
-	flex lex.l
+	flex calc.l
 
 teszt:
 	$(MAKE) all
-	 ./a.out < ./test/enter.code 
+	./a.out < ./test/enter.code

@@ -10,7 +10,7 @@
 
 %token NAME COLON LBRACE RBRACE RPAR LPAR
 
-%start input 
+%start input
 
 %%
 
@@ -19,7 +19,7 @@ input:
 
 %%
 
-void yyerror(char const *x) 
+void yyerror(char const *x)
 {
 	printf("Error %s\n", x);
 	exit(1);

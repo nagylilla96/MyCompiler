@@ -15,7 +15,8 @@ newline 		\n
 ")"				{ return RPAR;	 }
 "{"				{ return LBRACE; }
 "}"				{ return RBRACE; }
-{whitespace}	
+
+{whitespace}
 {newline} 		++yylineno;
 %%
 

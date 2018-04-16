@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/MyCompiler.dir/st/st.c.o CMakeFiles/MyCompiler.dir/ast.c.o CMakeFiles/MyCompiler.dir/grammar.tab.c.o CMakeFiles/MyCompiler.dir/lex.yy.c.o CMakeFiles/MyCompiler.dir/main.c.o  -o MyCompiler 
