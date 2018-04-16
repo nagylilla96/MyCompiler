@@ -297,6 +297,14 @@ struct mCc_ast_program {
 	definitions defs;
 };
 
+definitions mCc_ast_new_definitions(struct mCc_ast_function_def** defs);
+
+void mCc_ast_delete_definitions(definitions defs);
+
+struct mCc_ast_program *mCc_ast_new_program(definitions defs);
+
+void mCc_ast_delete_program(struct mCc_ast_program *prog);
+
 #ifdef __cplusplus
 }
 #endif

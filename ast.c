@@ -131,9 +131,7 @@ void mCc_ast_delete_expression(struct mCc_ast_expression *expression)
 
 	switch (expression->type) {
 	case MCC_AST_EXPRESSION_TYPE_LITERAL:
-		// printf("Trying to delete literal\n");
 		mCc_ast_delete_literal(expression->literal);
-		// printf("Deleted literal\n");
 		break;
 
 	case MCC_AST_EXPRESSION_TYPE_UNARY_OP:
@@ -159,11 +157,8 @@ void mCc_ast_delete_expression(struct mCc_ast_expression *expression)
 		break;
 
 	case MCC_AST_EXPRESSION_TYPE_FUNCT:
-		// printf("Trying to delete identifier and arguments\n");
 		mCc_ast_delete_identifier(expression->idf);
-		// printf("Deleted identifier\n");
 		mCc_ast_delete_arguments(expression->args);
-		// printf("Deleted identifier and arguments\n");
 		break;
 	}
 
@@ -264,9 +259,7 @@ void mCc_ast_delete_arguments(arguments args)
 	int i = 0;
 
 	while (args[i] != NULL) {
-		// printf("Trying to delete expression %d\n", i);
 		mCc_ast_delete_expression(args[i]);
-		// printf("Deleted expression %d\n", i);
 		i++;
 	}
 	free(args);
@@ -385,9 +378,7 @@ void mCc_ast_delete_statements(statements stats)
 	int i = 0;
 
 	while (stats[i] != NULL) {
-		// printf("Deleting statement %d\n", i);
 		mCc_ast_delete_statement(stats[i]);
-		// printf("Deleted statement %d\n", i);
 		i++;
 	}
 	free(stats);
@@ -440,15 +431,11 @@ void mCc_ast_delete_statement(struct mCc_ast_statement *statement)
 			break;	
 
 		case MCC_AST_STATEMENT_TYPE_EXPR:
-			// printf("Trying to delete expression\n");
 			mCc_ast_delete_expression(statement->expression);
-			// printf("Deleted expression\n");
 			break;
 
 		case MCC_AST_STATEMENT_TYPE_COMP:
-			// printf("Trying to delete statements\n");
 			mCc_ast_delete_statements(statement->stats);
-			// printf("Deleted statements\n");
 			break;
 	}
 
@@ -469,9 +456,6 @@ parameters mCc_ast_new_parameters(struct mCc_ast_statement** decls)
 	}
 	
 	parameters pars = decls;
-	if (!pars) {
-		return NULL;
-	}
 
 	return pars;
 }
@@ -482,9 +466,7 @@ void mCc_ast_delete_parameters(parameters pars)
 	int i = 0;
 
 	while (pars[i] != NULL) {
-		// printf("Trying to delete statement (declaration) %d\n", i);
 		mCc_ast_delete_statement(pars[i]);
-		// printf("Deleted statement (declaration) %d\n", i);
 		i++;
 	}
 	free(pars);
@@ -512,42 +494,50 @@ struct mCc_ast_function_def *mCc_ast_new_function_def(enum mCc_ast_literal_type 
 void mCc_ast_delete_function_def(struct mCc_ast_function_def *def)
 {
 	assert(def);
-	printf("Delete entered\n");
 	mCc_ast_delete_identifier(def->id);
-	printf("Identifier deleted\n");
 	mCc_ast_delete_parameters(def->pars);
 	mCc_ast_delete_statement(def->compound);
-	printf("Parameters deleted\n");
-	
 	free(def);
 }
 
 // /* ---------------------------------------------------------------- Program */
 
-// arguments mCc_ast_new_arguments(struct mCc_ast_expression** expressions) 
-// {
-// 	// arguments args = malloc(sizeof(args));
-// 	arguments args = expressions;
-// 	if (!args) {
-// 		return NULL;
-// 	}
+definitions mCc_ast_new_definitions(struct mCc_ast_function_def** def) {
+	assert(def);
+	definitions defs = def;
+	return defs;
+}
 
-// 	return args;
-// }
+void mCc_ast_delete_definitions(definitions defs) {
+	assert(defs);
+	int i = 0;
 
-// void mCc_ast_delete_arguments(arguments args)
-// {
-// 	assert(args);
-// 	int i = 0;
+	while (defs[i] != NULL) {
+		mCc_ast_delete_function_def(defs[i]);
+		i++;
+	}
+	free(defs);
+}
 
-// 	while (args[i] != NULL) {
-// 		printf("Trying to delete expression %d\n", i);
-// 		mCc_ast_delete_expression(args[i]);
-// 		printf("Deleted expression %d\n", i);
-// 		i++;
-// 	}
-// 	free(args);
-// }
+
+
+struct mCc_ast_program *mCc_ast_new_program(definitions defs) {
+	assert(defs);
+
+	struct mCc_ast_program *prog = malloc(sizeof(*prog));
+	if (!prog) {
+		return NULL;
+	}
+
+	prog->defs = defs;
+	return prog;
+}
+
+void mCc_ast_delete_program(struct mCc_ast_program *prog) {
+	assert(prog);
+	mCc_ast_delete_definitions(prog->defs);
+	free(prog);
+}
 
 /* ---------------------------------------------------------------- Tester */
 
@@ -556,83 +546,74 @@ int main() {
 	char *var2 = "y";
 	char *var3 = "xx";
 	char *var4 = "yy";
-	char *func = "func";
-
-	// printf("Before anything\n");
-
-	// struct mCc_ast_expression *expression = mCc_ast_new_expression_binary_op(MCC_AST_BINARY_OP_EQ, mCc_ast_new_expression_identifier(var1, NULL), 
-		// mCc_ast_new_expression_literal(mCc_ast_new_literal_int(5)));
-	// struct mCc_ast_expression *expression = mCc_ast_new_expression_identifier(var1, NULL);
-	// printf("%s == %d\n", expression->lhs->id, expression->rhs->literal->i_value);
-	// printf("After expression\n");
-	// struct mCc_ast_statement *statement = mCc_ast_new_statement_assignment(mCc_ast_new_identifier(var2), NULL,
-		// mCc_ast_new_expression_literal(mCc_ast_new_literal_int(3)));
-	// printf("%s = %d\n", statement->asid, statement->rexp->literal->i_value);
-	// printf("After statement\n");
-	struct mCc_ast_expression** expressions = malloc(sizeof(expressions) * 2);
-	expressions[0] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(1));
-	
-	expressions[1] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(2));
-
-	struct mCc_ast_expression** exprs = malloc(sizeof(exprs) * 2);
-	exprs[0] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(1));
-	
-	exprs[1] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(2));
-	
-	arguments args1 = mCc_ast_new_arguments(expressions);
-	arguments args2 = mCc_ast_new_arguments(exprs);
-	// printf("Expression 0: %d\n", args[0]->literal->i_value);
-	// printf("Expression 1: %d\n", args[1]->literal->i_value);
-
-	struct mCc_ast_statement** stats = malloc(sizeof(stats) * 2);
-	stats[0] = mCc_ast_new_statement_expression(mCc_ast_new_expression_function(var1, args1));
-	stats[1] = mCc_ast_new_statement_expression(mCc_ast_new_expression_function(var2, args2));
+	char *var5 = "xxx";
+	char *var6 = "yyy";
+	char *var7 = "xxxx";
+	char *var8 = "yyyy";
+	char *func1 = "func1";
+	char *func2 = "func2";
 
 	struct mCc_ast_expression** e1 = malloc(sizeof(e1) * 2);
 	e1[0] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(1));
-	
+
 	e1[1] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(2));
 
 	struct mCc_ast_expression** e2 = malloc(sizeof(e2) * 2);
 	e2[0] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(1));
-	
+
 	e2[1] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(2));
-	
+
 	arguments a1 = mCc_ast_new_arguments(e1);
 	arguments a2 = mCc_ast_new_arguments(e2);
-	// printf("Expression 0: %d\n", args[0]->literal->i_value);
-	// printf("Expression 1: %d\n", args[1]->literal->i_value);
 
-	struct mCc_ast_statement** s = malloc(sizeof(stats) * 2);
+	struct mCc_ast_statement** s = malloc(sizeof(struct mCc_ast_statement*) * 2);
 	s[0] = mCc_ast_new_statement_expression(mCc_ast_new_expression_function(var1, a1));
 	s[1] = mCc_ast_new_statement_expression(mCc_ast_new_expression_function(var2, a2));
-	
-	// expressions[1] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(2));
-	// struct mCc_ast_statement *fullstatement = mCc_ast_new_statement_expression(mCc_ast_new_expression_function(var1, args));
-	struct mCc_ast_statement *stat = mCc_ast_new_statement_compound(stats);
+
 	struct mCc_ast_statement *comp = mCc_ast_new_statement_compound(s);
 
-	// printf("%s(%d, %d);\n", stat->stats[0]->expression->idf, stat->stats[0]->expression->args[0]->literal->i_value, stat->stats[0]->expression->args[1]->literal->i_value);
-	// printf("%s(%d, %d);\n", stat->stats[1]->expression->idf, stat->stats[1]->expression->args[0]->literal->i_value, stat->stats[1]->expression->args[1]->literal->i_value);
-
-	// printf("while (%s == %d) { %s = %d; }\n", fullstatement->ifexp->lhs->id, fullstatement->ifexp->rhs->literal->i_value,
-		// fullstatement->ifstat->asid, fullstatement->ifstat->rexp->literal->i_value);
-	mCc_ast_delete_statement(stat);
-
-	struct mCc_ast_statement **statements = malloc(sizeof(statements) * 2);
+	// PARS
+	struct mCc_ast_statement **statements = malloc(sizeof(*statements) * 2);
 	statements[0] = mCc_ast_new_statement_declaration(MCC_AST_LITERAL_TYPE_INT, mCc_ast_new_literal_int(1), mCc_ast_new_identifier(var3));
 	statements[1] = mCc_ast_new_statement_declaration(MCC_AST_LITERAL_TYPE_INT, mCc_ast_new_literal_int(2), mCc_ast_new_identifier(var4));
 
 	parameters pars = mCc_ast_new_parameters(statements);
 
-	struct mCc_ast_function_def *fdef = mCc_ast_new_function_def(MCC_AST_LITERAL_TYPE_INT, mCc_ast_new_identifier(func), pars, s);
+	struct mCc_ast_function_def *fdef1 = mCc_ast_new_function_def(MCC_AST_LITERAL_TYPE_INT, mCc_ast_new_identifier(func1), pars, comp);
 
-	printf("Function defined\n");
+	struct mCc_ast_expression** e3 = malloc(sizeof(e3) * 2);
+	e3[0] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(1));
 
-	printf("%s = %d\n", fdef->pars[0]->declid, fdef->pars[0]->decllit->i_value);
-	printf("%s = %d\n", fdef->pars[1]->declid, fdef->pars[1]->decllit->i_value);
+	e3[1] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(2));
 
-	mCc_ast_delete_function_def(fdef);
-	// mCc_ast_delete_statements(fullstatement);
+	struct mCc_ast_expression** e4 = malloc(sizeof(e4) * 2);
+	e4[0] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(1));
+
+	e4[1] = mCc_ast_new_expression_literal(mCc_ast_new_literal_int(2));
+
+	arguments a3 = mCc_ast_new_arguments(e3);
+	arguments a4 = mCc_ast_new_arguments(e4);
+
+	struct mCc_ast_statement** ss = malloc(sizeof(struct mCc_ast_statement*) * 2);
+	ss[0] = mCc_ast_new_statement_expression(mCc_ast_new_expression_function(var5, a3));
+	ss[1] = mCc_ast_new_statement_expression(mCc_ast_new_expression_function(var6, a4));
+
+	struct mCc_ast_statement *compp = mCc_ast_new_statement_compound(ss);
+
+	// PARS
+	struct mCc_ast_statement **statementss = malloc(sizeof(*statementss) * 2);
+	statementss[0] = mCc_ast_new_statement_declaration(MCC_AST_LITERAL_TYPE_INT, mCc_ast_new_literal_int(1), mCc_ast_new_identifier(var7));
+	statementss[1] = mCc_ast_new_statement_declaration(MCC_AST_LITERAL_TYPE_INT, mCc_ast_new_literal_int(2), mCc_ast_new_identifier(var8));
+
+	parameters parss = mCc_ast_new_parameters(statementss);
+
+	struct mCc_ast_function_def *fdeff = mCc_ast_new_function_def(MCC_AST_LITERAL_TYPE_INT, mCc_ast_new_identifier(func2), parss, compp);
+
+	struct mCc_ast_function_def **defs = malloc(sizeof(*defs) * 1);
+	defs[0] = fdef1;
+	defs[1] = fdeff;
+	struct mCc_ast_program *program = mCc_ast_new_program(defs);
+	printf("program created\n");
+	mCc_ast_delete_program(program);
 	return 0;
 }
